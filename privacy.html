@@ -10,7 +10,7 @@ main{max-width:780px;margin:0 auto}h1{color:var(--acc);font-size:26px;margin-bot
 .meta{color:var(--mut);margin-top:0}.draft{background:#b3261e22;color:#b3261e;border:1px solid #b3261e;border-radius:12px;padding:10px 14px;font-weight:bold}
 mark.ph{background:#ffd54f88;color:inherit;padding:0 4px;border-radius:4px}
 ul{padding-inline-start:22px}a{color:var(--acc)}.back{display:inline-block;margin-bottom:10px}
-table{width:100%;border-collapse:collapse;font-size:15px}td,th{border-bottom:1px solid var(--line);padding:8px;text-align:right;vertical-align:top}
+table{width:100%;border-collapse:collapse;font-size:15px;display:block;overflow-x:auto}td,th{word-break:break-word}td,th{border-bottom:1px solid var(--line);padding:8px;text-align:right;vertical-align:top}
 </style></head><body><main><a class="back" href="./">← العودة إلى روايتي</a>
 <h1>سياسة الخصوصية</h1><p class="meta">تطبيق «روايتي» · آخر تحديث: 3 أكتوبر 2026</p><p class="draft">⚠ مسودة للمراجعة القانونية: املأ الحقول المظللة بالأصفر، وراجع النص مع محامٍ مختص، ثم احذف هذا التنبيه قبل النشر.</p>
 <p>«روايتي» تطبيق ويب عربي لكتابة الروايات وتنظيمها وتصديرها. نحترم خصوصيتك، وخصوصاً أن رواياتك قد تكون أعمالاً لم تُنشر بعد. توضح هذه السياسة ما نجمعه من بيانات، ولماذا، ومع من تُعالَج، وما حقوقك.</p>
@@ -24,9 +24,10 @@ table{width:100%;border-collapse:collapse;font-size:15px}td,th{border-bottom:1px
 <li><b>محتواك:</b> عناوين رواياتك واسم المؤلف الذي تكتبه، وصور الأغلفة التي ترفعها، ونصوص الفصول، والإهداء والمقدمة، وإعدادات الرواية (القالب، ونمط الفصول، وهدف الكتابة).</li>
 <li><b>إحصائيات الكتابة:</b> عدد الحروف والكلمات التي كتبتها أو مسحتها كل يوم وفي كل جلسة كتابة (وقت البدء والانتهاء واسم الرواية)، وهدفك اليومي. نعرضها لك أنت فقط.</li>
 <li><b>بيانات تقنية:</b> عند اتصال متصفحك بالخدمات التي يعتمد عليها التطبيق (الاستضافة وFirebase وشبكات توصيل المكتبات) قد تُسجَّل بيانات مثل عنوان IP ونوع المتصفح والجهاز والوقت. تسجلها هذه الجهات لأغراضها التقنية والأمنية.</li>
+<li><b>صندوق الأفكار:</b> نصوص الأفكار التي تكتبها، وما يستخرجه التطبيق منها (شخصيات وأحداث وعناصر وتصنيف تقريبي)، وتتحلل على جهازك، وتُحفظ في حسابك مثل رواياتك.</li>
 <li><b>على جهازك:</b> يستخدم التطبيق تخزين المتصفح (localStorage وIndexedDB وذاكرة Service Worker) لحفظ نسخة مؤقتة تمكّنك من العمل عند انقطاع الاتصال وتسرّع التحميل. ويمكنك مسحها من إعدادات المتصفح.</li>
 </ul>
-<p><b>ما لا نجمعه:</b> لا نجمع موقعك الجغرافي ولا جهات اتصالك ولا بيانات الدفع (التطبيق مجاني حالياً). ولا نستخدم حالياً أدوات تحليلات أو إعلانات أو تتبع لأغراض تسويقية. إن أضفنا أداة من هذا النوع فسنحدّث هذه السياسة قبل تفعيلها.</p>
+<p><b>ما لا نجمعه:</b> لا نجمع موقعك الجغرافي ولا جهات اتصالك ولا بيانات الدفع (التطبيق مجاني حالياً). لا نعرض إعلانات ولا نستخدم أي تتبع لأغراض تسويقية. وتحليلات الزيارات (Google Analytics) لا تعمل إلا إذا وافقت عليها، كما هو موضح في البند 4.</p>
 
 <h2>3. لماذا نستخدم بياناتك</h2>
 <ul>
@@ -48,6 +49,9 @@ table{width:100%;border-collapse:collapse;font-size:15px}td,th{border-bottom:1px
 <tr><td>Google (خوادم gstatic)</td><td>تحميل مكتبات Firebase التي يعمل بها التطبيق</td><td><a href="https://policies.google.com/privacy" target="_blank" rel="noopener">policies.google.com/privacy</a></td></tr>
 <tr><td>GitHub Pages</td><td>استضافة صفحات التطبيق</td><td><a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" target="_blank" rel="noopener">GitHub Privacy Statement</a></td></tr>
 <tr><td>Cloudflare (cdnjs)</td><td>تحميل مكتبة إنشاء ملفات Word</td><td><a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener">cloudflare.com/privacypolicy</a></td></tr>
+<tr><td>Google Analytics (اختياري، بموافقتك)</td><td>قياس عدد الزوار والصفحات ونوع الجهاز والدولة التقريبية بشكل مجهول. نحمّله فقط بعد موافقتك، وتقدر ترجع تغيّر قرارك من «إعدادات الإحصائيات» أسفل الصفحة الرئيسية. بنقيّد إعلانات جوجل وربط البيانات بإعلاناتها، ومابنرسلش أي محتوى من رواياتك.</td><td><a href="https://policies.google.com/privacy" target="_blank" rel="noopener">policies.google.com/privacy</a></td></tr>
+<tr><td>YouTube (اختياري)</td><td>لو شغّلت موسيقى من رابط يوتيوب أثناء الكتابة، يحمّل التطبيق مشغّل يوتيوب (youtube-nocookie.com) فقط في هذه الحالة.</td><td><a href="https://policies.google.com/privacy" target="_blank" rel="noopener">policies.google.com/privacy</a></td></tr>
+<tr><td>Google Drive (اختياري)</td><td>لو ربطت حسابك في Drive للنسخ الاحتياطي، يرفع التطبيق ملف النسخة إلى مساحتك أنت فقط، ويطلب صلاحية الملفات التي ينشئها التطبيق بنفسه.</td><td><a href="https://policies.google.com/privacy" target="_blank" rel="noopener">policies.google.com/privacy</a></td></tr>
 </table>
 <p>لا نشارك بياناتك مع أي جهة أخرى، إلا إذا أُلزمنا بذلك بموجب القانون أو أمر قضائي.</p>
 
