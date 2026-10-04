@@ -452,12 +452,12 @@ details button{width:100%;margin-top:8px}
 </section>
 </main>
 <div id="pv"><div class="tb" style="text-align:center;margin-bottom:12px"><button class="btn g" id="bk">← رجوع للمحرر</button> <button class="btn" id="pr">طباعة / حفظ PDF</button> <button class="btn" id="dx">تصدير Word</button></div><div id="bookwrap"></div></div>
-<footer id="cp">© 2026 · حقوق الملكية محفوظة لـ أحمد محمد عبد الواحد<br><a href="tel:01043141154" dir="ltr">01043141154</a> · <a id="gas">إعدادات الإحصائيات</a></footer>
+<footer id="cp">© 2026 · حقوق الملكية محفوظة لـ أحمد محمد عبد الواحد<br><a href="tel:01043141154" dir="ltr">01043141154</a> · <a id="gas">إعدادات الإحصائيات</a><span id="sfw" hidden> · <a id="sfm" style="cursor:pointer">إيقاف الوضع الآمن</a></span></footer>
 <div id="gab"><b>إحصائيات الزيارات</b><br>نستخدم Google Analytics لقياس عدد زوار التطبيق بشكل مجهول، من غير ما نبعت لجوجل أي شيء من محتوى رواياتك. موافق؟ <a href="privacy.html" target="_blank" rel="noopener" style="color:var(--acc)">التفاصيل</a><div class="r"><button class="btn" id="gay">موافق</button><button class="btn g" id="gan">لا، شكراً</button></div></div>
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
 import {getAuth,onAuthStateChanged,createUserWithEmailAndPassword,signInWithEmailAndPassword,signOut,sendPasswordResetEmail,sendEmailVerification,GoogleAuthProvider,signInWithPopup,EmailAuthProvider,reauthenticateWithCredential,reauthenticateWithPopup,deleteUser} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
-import {initializeFirestore,getFirestore,persistentLocalCache,persistentMultipleTabManager,doc,collection,getDocs,writeBatch,terminate,clearIndexedDbPersistence,waitForPendingWrites} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+import {initializeFirestore,getFirestore,persistentLocalCache,persistentMultipleTabManager,memoryLocalCache,doc,collection,getDocs,writeBatch,terminate,clearIndexedDbPersistence,waitForPendingWrites} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 const $=id=>document.getElementById(id);
 const K="rewayati_v2";
 let db={novels:[]},s=null,tab="wip",timer;
@@ -823,7 +823,12 @@ $("gay").onclick=()=>gaSet("1");$("gan").onclick=()=>gaSet("0");$("gas").onclick
 setTimeout(()=>{let v=null;try{v=localStorage.getItem("rewayati_ga")}catch(x){}if(v=="1"||(!GA_ASK&&v!="0"))loadGA();else if(v!="0")$("gab").classList.add("on")},3000);
 $("lg3").src=$("lg").src;
 const app=initializeApp({apiKey:"AIzaSyA3A92aXsxzbUB-fCxc0fe6P2SFHmtTVgs",authDomain:"rewayati-8a15b.firebaseapp.com",projectId:"rewayati-8a15b",storageBucket:"rewayati-8a15b.firebasestorage.app",messagingSenderId:"910214821467",appId:"1:910214821467:web:24b8921c82f514ade3b17e"});const auth=getAuth(app);
-let FS;try{FS=initializeFirestore(app,{localCache:persistentLocalCache({tabManager:persistentMultipleTabManager()})})}catch(e){FS=getFirestore(app)}
+const SAFE=(()=>{try{return !!localStorage.getItem("rewayati_safe")}catch(e){return false}})();
+const tmo=(p,ms)=>Promise.race([p,new Promise((_,r)=>setTimeout(()=>r(new Error("timeout")),ms))]);
+const LOAD_TMO=window.__LOAD_TMO||20000;
+let FS;try{FS=initializeFirestore(app,{localCache:SAFE?memoryLocalCache():persistentLocalCache({tabManager:persistentMultipleTabManager()}),experimentalAutoDetectLongPolling:true})}catch(e){try{FS=getFirestore(app)}catch(x){}}
+function loadFail(m){$("al").hidden=false;$("af").hidden=true;$("al").innerHTML="<p>"+m+"</p><button class=\"btn\" id=\"rt\">🔄 إعادة المحاولة</button><button class=\"btn g\" id=\"sm\">🛟 وضع آمن (بدون تخزين محلي)</button>";$("rt").onclick=()=>location.reload();$("sm").onclick=()=>{try{localStorage.setItem("rewayati_safe","1")}catch(e){}location.reload()}}
+if(SAFE){$("sfw").hidden=false;$("sfm").onclick=()=>{try{localStorage.removeItem("rewayati_safe")}catch(e){}location.reload()}}
 const chdoc=(n_,i_)=>doc(FS,"users",U.uid,"novels",n_,"chapters",i_);
 const busy=on=>$("ld").style.display=on?"flex":"none";
 async function loadAll(){const q=await getDocs(collection(FS,"users",U.uid,"novels"));if(q.empty&&!navigator.onLine&&q.metadata&&q.metadata.fromCache)throw new Error("offline-empty");db.novels=q.docs.map(d=>{const v=d.data();return{id:d.id,title:v.title||"",author:v.author||"",tpl:v.tpl||"pub",cover:v.cover||"",status:v.status||"wip",updated:v.updated||0,cur:v.cur||0,wc:v.wc||0,auto:!!v.auto,aw:v.aw||2500,gt:v.gt||"",gw:v.gw||0,chs:v.chs||[],ch:null}})}
@@ -861,7 +866,7 @@ $("out").onclick=async()=>{
 if(!navigator.onLine){alert("أنت غير متصل بالإنترنت. ماتسجّلش خروج دلوقتي، عشان ما يتمسحش اللي لسه ماتزامنش. اتصل بالنت وجرّب تاني.");return}
 if(pend>0&&!confirm("في تعديلات لسه ماترفعتش لحسابك. هستنى المزامنة قبل الخروج. تكمل؟"))return;
 busy(1);try{flush();flushSt();await Promise.race([waitForPendingWrites(FS),new Promise((_,r)=>setTimeout(()=>r(new Error("timeout")),20000))])}catch(e){busy(0);alert("ماقدرتش أكمّل المزامنة قبل الخروج، فبياناتك المحلية ماتمسحتش. جرّب تاني بعد شوية.");return}
-try{await signOut(auth)}catch(e){}try{await terminate(FS);await clearIndexedDbPersistence(FS)}catch(e){}try{await caches.delete("rewayati-data")}catch(e){}
+try{await signOut(auth)}catch(e){}try{await tmo((async()=>{await terminate(FS);await clearIndexedDbPersistence(FS)})(),4000)}catch(e){}try{await caches.delete("rewayati-data")}catch(e){}
 busy(0);location.reload()};
 $("del").onclick=async()=>{if(!confirm("هتحذف حسابك وكل رواياتك نهائياً ومش هتقدر ترجّعها. متأكد؟"))return;if(prompt("للتأكيد اكتب كلمة: حذف")!=="حذف")return;
 try{if(U.providerData.some(p=>p.providerId=="password")){const p=prompt("اكتب كلمة السر الحالية للتأكيد");if(!p)return;await reauthenticateWithCredential(U,EmailAuthProvider.credential(U.email,p))}else await reauthenticateWithPopup(U,new GoogleAuthProvider());
@@ -872,9 +877,9 @@ if("serviceWorker" in navigator)addEventListener("load",async()=>{try{await navi
 onAuthStateChanged(auth,async u=>{U=u;
 if(!u){db={novels:[]};s=null;$("al").hidden=true;$("af").hidden=false;$("em1").value="";$("pw1").value="";document.body.classList.add("auth-on");return}
 $("af").hidden=true;$("al").hidden=false;$("al").textContent="جارٍ تحميل رواياتك…";
-try{await loadAll()}catch(e){$("al").textContent="تعذّر تحميل رواياتك. تأكد من الاتصال وحدّث الصفحة.";return}
-try{await loadStats()}catch(e){ST={};GOAL=0}
-try{await loadIdeas()}catch(e){IDEAS=[]}
+try{await tmo(loadAll(),LOAD_TMO)}catch(e){loadFail(e.message=="timeout"?"التحميل أخد وقت أطول من المعتاد. ممكن النت يكون ضعيف، أو التطبيق مفتوح في أكتر من نافذة. جرّب إعادة المحاولة، ولو فضل كده جرّب الوضع الآمن.":"تعذّر تحميل رواياتك. تأكد من الاتصال وجرّب تاني.");return}
+try{await tmo(loadStats(),10000)}catch(e){ST={};GOAL=0}
+try{await tmo(loadIdeas(),10000)}catch(e){IDEAS=[]}
 document.body.classList.remove("auth-on");document.body.classList.add("home-on");$("em").textContent=u.email||"";tab="wip";home();offerMigrate();netUi();setTimeout(()=>{prefetch();ideaReminder();bkCheck();updDigest()},1500)});
 
 </script>
