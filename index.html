@@ -825,7 +825,7 @@ let body="";expCh().filter(c=>c.k!="ded").forEach((c,i)=>{css+='.c'+i+'{page:c'+
 $("pgs").textContent=css;h+='<div class="pg">'+body+'</div>';
 $("bookwrap").innerHTML=h;document.body.classList.add("pv-on");scrollTo(0,0)};
 $("bk").onclick=()=>document.body.classList.remove("pv-on");
-$("pr").onclick=()=>print();
+$("pr").onclick=()=>{if(!document.body.classList.contains("pv-on"))$("pvb").click();setTimeout(()=>window.print(),180)};
 const cl=x=>esc(x.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g,""));
 const rx=(o,z)=>'<w:rPr><w:rFonts w:ascii="Traditional Arabic" w:hAnsi="Traditional Arabic" w:cs="Traditional Arabic"/>'+(o.b?'<w:b/><w:bCs/>':'')+(o.i?'<w:i/><w:iCs/>':'')+'<w:sz w:val="'+z+'"/><w:szCs w:val="'+z+'"/>'+(o.u?'<w:u w:val="single"/>':'')+'<w:rtl/></w:rPr>';
 const R=(t,o,z)=>'<w:r>'+rx(o,z)+'<w:t xml:space="preserve">'+cl(t)+'</w:t></w:r>';
@@ -837,6 +837,8 @@ if(/^(DIV|P|H[1-6]|LI)$/.test(tg)){if(cur.length)fl();const pv=al;al=st.textAlig
 root.childNodes.forEach(c=>walk(c,{}));if(cur.length)fl();return out}
 async function exportDocx(){
 if(typeof JSZip=="undefined"){alert("تعذّر تحميل مكتبة التصدير. جرّب PDF.");return}
+const docxName=(s.title||"روايتي").replace(/[\/:*?"<>|]/g,"")+".docx";
+const saveHandle=await pickSaveHandle(docxName);
 const dl=await getDl();
 const o={pub:{w:8391,h:11906,m:1020,z:28},kdp:{w:8640,h:12960,m:1080,z:26}}[s.tpl];const title=s.title||"عنوان الرواية";
 const pg='<w:pgSz w:w="'+o.w+'" w:h="'+o.h+'"/><w:pgMar w:top="'+o.m+'" w:right="'+o.m+'" w:bottom="'+o.m+'" w:left="'+o.m+'" w:header="500" w:footer="500" w:gutter="0"/>';
@@ -862,7 +864,7 @@ zip.file("word/styles.xml",X+'<w:styles xmlns:w="http://schemas.openxmlformats.o
 zip.file("word/header1.xml",X+'<w:hdr '+NS+'>'+P(R(title+" — ",{},20)+'<w:fldSimple w:instr=" STYLEREF &quot;heading 1&quot; "><w:r>'+rx({},20)+'<w:t>الفصل</w:t></w:r></w:fldSimple>',{jc:"center"})+'</w:hdr>');
 zip.file("word/footer1.xml",X+'<w:ftr '+NS+'>'+P('<w:fldSimple w:instr="PAGE"><w:r>'+rx({},22)+'<w:t>1</w:t></w:r></w:fldSimple>',{jc:"center"})+'</w:ftr>');
 const blob=await zip.generateAsync({type:"blob",mimeType:"application/vnd.openxmlformats-officedocument.wordprocessingml.document"});
-try{await dl.save({filename:(s.title||"روايتي").replace(/[\\\/:*?"<>|]/g,"")+".docx",data:blob})}catch(e){if(e.code!="declined")alert("تعذّر حفظ الملف ("+(e.code||"خطأ")+")")}}
+try{await dl.save({filename:docxName,data:blob,handle:saveHandle});alert("✓ تم تصدير Word بنجاح: "+docxName)}catch(e){if(e&&e.name==="AbortError")return;if(e.code!="declined")alert("تعذّر حفظ ملف Word ("+(e.code||e.message||"خطأ")+")")}}
 $("dx").onclick=()=>exportDocx().catch(e=>alert("حدث خطأ أثناء تصدير Word: "+e.message));
 const wc1=n=>n.ch?n.ch.reduce((a,c)=>a+cw(c),0):(n.wc||0);
 function home(){document.body.classList.add("home-on");secUi();const w=db.novels.filter(n=>n.status!="done"),d=db.novels.filter(n=>n.status=="done");$("n1").textContent="("+w.length+")";$("n2").textContent="("+d.length+")";
@@ -886,7 +888,16 @@ $("nn").onclick=()=>{if(sec=="id"){$("idt").focus();scrollTo(0,0);return}const n
 $("st").onclick=()=>{s.status=s.status=="done"?"wip":"done";tab=s.status;s.updated=Date.now();clearTimeout(timer);persist();s=null;home()};
 document.querySelectorAll("#home .tabs button").forEach(b=>b.onclick=()=>{tab=b.dataset.t;home()});
 $("th2").onclick=()=>$("th").click();
-async function getDl(){let d=null;try{d=await claude.use("downloads")}catch(e){}return d||{save:async({filename:n,data:b})=>{const u=URL.createObjectURL(b),k=document.createElement("a");k.href=u;k.download=n;document.body.appendChild(k);k.click();k.remove();setTimeout(()=>URL.revokeObjectURL(u),4000)}}}
+/* تنزيل الملفات: نافذة الحفظ الأصلية أولاً حتى لا يلتقط مدير تحميل خارجي روابط blob: */
+function fileKind(name){const n=(name||"").toLowerCase();if(n.endsWith(".docx"))return{mime:"application/vnd.openxmlformats-officedocument.wordprocessingml.document",ext:".docx",desc:"Microsoft Word"};if(n.endsWith(".epub"))return{mime:"application/epub+zip",ext:".epub",desc:"EPUB"};if(n.endsWith(".json"))return{mime:"application/json",ext:".json",desc:"JSON"};return{mime:"application/octet-stream",ext:"",desc:"ملف"}}
+async function pickSaveHandle(filename){if(!window.showSaveFilePicker)return null;const kind=fileKind(filename);return window.showSaveFilePicker({suggestedName:filename,types:[{description:kind.desc,accept:{[kind.mime]:[kind.ext]}}]})}
+async function nativeSaveFile(filename,data,handle){
+ if(handle){const w=await handle.createWritable();await w.write(data);await w.close();return}
+ if(window.showSaveFilePicker){const h=await pickSaveHandle(filename);const w=await h.createWritable();await w.write(data);await w.close();return}
+ if(navigator.msSaveOrOpenBlob){navigator.msSaveOrOpenBlob(data,filename);return}
+ const u=URL.createObjectURL(data),a=document.createElement("a");a.href=u;a.download=filename;a.rel="noopener";a.style.display="none";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),10000)
+}
+async function getDl(){return{save:async({filename,data,handle})=>nativeSaveFile(filename,data,handle)}}
 const HRX=new RegExp("^\\s*(?:ال)?(?:فصل|باب|جزء)\\s+(?:[0-9٠-٩]+|الأول|الاول|الأولى|الاولى|الثاني|الثانية|الثالث|الثالثة|الرابع|الرابعة|الخامس|الخامسة|السادس|السادسة|السابع|السابعة|الثامن|الثامنة|التاسع|التاسعة|العاشر|العاشرة|الحادي|العشرون|الثلاثون|الأربعون|الأخير|الاخير|الأخيرة|الختامي|واحد|اثنان|اثنين|ثلاثة|أربعة|خمسة|ستة|سبعة|ثمانية|تسعة|عشرة)(?![\\u0600-\\u06FF])");
 const isH=t=>t.length<=50&&!/[.!؟?،…]$/.test(t)&&HRX.test(t);
 const pHtml=p=>'<div'+(p.al?' style="text-align:'+p.al+'"':'')+'>'+(p.h||'<br>')+'</div>';
@@ -1229,16 +1240,29 @@ function nxRestoreDraft(n){try{const x=JSON.parse(localStorage.getItem("rewayati
 addEventListener("beforeunload",()=>{try{if(s)localStorage.setItem("rewayati_draft_"+s.id,JSON.stringify({updated:Date.now(),novel:s}))}catch(e){}});
 /* EPUB حقيقي: حزمة EPUB 3 بسيطة ومتوافقة */
 function dataParts(data){const m=data.match(/^data:([^;]+);base64,(.*)$/s);return m?{mime:m[1],b64:m[2]}:null}
-async function exportEpub(){if(typeof JSZip=="undefined"){alert("تعذّر تحميل مكتبة EPUB.");return}try{await loadCh(s);const zip=new JSZip();zip.file("mimetype","application/epub+zip",{compression:"STORE"});zip.file("META-INF/container.xml",`<?xml version="1.0" encoding="UTF-8"?><container version="1.0" xmlns="urn:oasis:names:tc:opendocument:xmlns:container"><rootfiles><rootfile full-path="OEBPS/content.opf" media-type="application/oebps-package+xml"/></rootfiles></container>`);const title=esc(s.title||"رواية").replace(/&quot;/g,'&quot;'),author=esc(s.author||"");let manifest='',spine='',chap='';
-if(s.cover){const d=dataParts(s.cover);if(d){zip.file("OEBPS/images/cover.jpg",d.b64,{base64:true});manifest+='<item id="cover-image" href="images/cover.jpg" media-type="image/jpeg" properties="cover-image"/>';}}
-manifest+='<item id="css" href="style.css" media-type="text/css"/><item id="nav" href="nav.xhtml" media-type="application/xhtml+xml" properties="nav"/>';
-const items=[];if(s.cover){chap+='<section class="cover"><img src="images/cover.jpg" alt="غلاف الرواية"/></section>'}chap+='<section class="title"><h1>'+title+'</h1><p>'+author+'</p></section>';
-for(let i=0;i<expCh().filter(c=>c.k!="ded").length;i++){const c=expCh().filter(x=>x.k!="ded")[i],id='ch'+i,file='chapter'+(i+1)+'.xhtml';manifest+='<item id="'+id+'" href="'+file+'" media-type="application/xhtml+xml"/>';spine+='<itemref idref="'+id+'"/>';items.push({id,file,c});}
-items.forEach(x=>{const body='<h2>'+esc(x.c.t||('الفصل '+(items.indexOf(x)+1)))+'</h2><div class="body">'+x.c.h+'</div>';zip.file('OEBPS/'+x.file,'<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml" lang="ar" dir="rtl"><head><meta charset="utf-8"/><title>'+esc(x.c.t||'فصل')+'</title><link rel="stylesheet" href="style.css"/></head><body>'+body+'</body></html>')});
-zip.file('OEBPS/nav.xhtml','<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" lang="ar" dir="rtl"><head><title>المحتويات</title></head><body><nav epub:type="toc"><h1>المحتويات</h1><ol>'+items.map(x=>'<li><a href="'+x.file+'">'+esc(x.c.t||'فصل')+'</a></li>').join('')+'</ol></nav></body></html>');
-zip.file('OEBPS/style.css','html,body{direction:rtl;background:#fff;color:#222;font-family:serif}body{line-height:2;font-size:1em;margin:6%}h1,h2{text-align:center}p{text-align:center}.body p{text-indent:1.2em}.cover{text-align:center}.cover img{max-width:100%;height:auto}.title{min-height:80vh;display:flex;flex-direction:column;justify-content:center;align-items:center}');
-zip.file('OEBPS/content.opf','<?xml version="1.0" encoding="UTF-8"?><package xmlns="http://www.idpf.org/2007/opf" version="3.0" unique-identifier="bookid" xml:lang="ar" dir="rtl"><metadata xmlns:dc="http://purl.org/dc/elements/1.1/"><dc:identifier id="bookid">urn:uuid:'+crypto.randomUUID()+'</dc:identifier><dc:title>'+title+'</dc:title><dc:creator>'+author+'</dc:creator><dc:language>ar</dc:language><meta property="dcterms:modified">'+new Date().toISOString().replace(/\.\d{3}Z$/,'Z')+'</meta></metadata><manifest>'+manifest+'</manifest><spine page-progression-direction="rtl">'+spine+'</spine></package>');
-const blob=await zip.generateAsync({type:'blob',mimeType:'application/epub+zip'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=(s.title||'روايتي').replace(/[\\/:*?"<>|]/g,'_')+'.epub';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)}catch(e){console.error(e);alert('تعذّر إنشاء EPUB: '+(e.message||'خطأ'))}}
+async function exportEpub(){
+ if(typeof JSZip=="undefined"){alert("تعذّر تحميل مكتبة EPUB. تأكد من الاتصال بالإنترنت ثم حاول مرة أخرى.");return}
+ const filename=(s.title||"روايتي").replace(/[\/:*?"<>|]/g,"_")+".epub";let saveHandle=null;
+ try{
+  if(window.showSaveFilePicker)saveHandle=await window.showSaveFilePicker({suggestedName:filename,types:[{description:"EPUB",accept:{"application/epub+zip":[".epub"]}}]});
+  await loadCh(s);const zip=new JSZip();
+  zip.file("mimetype","application/epub+zip",{compression:"STORE"});
+  zip.file("META-INF/container.xml",`<?xml version="1.0" encoding="UTF-8"?><container version="1.0" xmlns="urn:oasis:names:tc:opendocument:xmlns:container"><rootfiles><rootfile full-path="OEBPS/content.opf" media-type="application/oebps-package+xml"/></rootfiles></container>`);
+  const title=esc(s.title||"رواية"),author=esc(s.author||""),chapters=expCh();let manifest="",spine="",navItems=[],items=[];
+  if(s.cover){const d=dataParts(s.cover);if(d){zip.file("OEBPS/images/cover.jpg",d.b64,{base64:true});manifest+='<item id="cover-image" href="images/cover.jpg" media-type="image/jpeg" properties="cover-image"/>';}}
+  manifest+='<item id="css" href="style.css" media-type="text/css"/><item id="nav" href="nav.xhtml" media-type="application/xhtml+xml" properties="nav"/><item id="title-page" href="title.xhtml" media-type="application/xhtml+xml"/>';spine+='<itemref idref="title-page"/>';
+  if(s.cover){manifest+='<item id="cover-page" href="cover.xhtml" media-type="application/xhtml+xml"/>';spine+='<itemref idref="cover-page"/>'}
+  chapters.forEach((c,i)=>{const id="item"+i,file="chapter"+(i+1)+".xhtml",label=c.t||("الفصل "+(i+1));manifest+='<item id="'+id+'" href="'+file+'" media-type="application/xhtml+xml"/>';spine+='<itemref idref="'+id+'"/>';navItems.push({file,label});items.push({file,c,label})});
+  zip.file("OEBPS/title.xhtml",'<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml" lang="ar" dir="rtl"><head><meta charset="utf-8"/><title>'+title+'</title><link rel="stylesheet" href="style.css"/></head><body><main class="title"><h1>'+title+'</h1><p class="author">'+author+'</p><p class="brand">روايتي</p></main></body></html>');
+  if(s.cover)zip.file("OEBPS/cover.xhtml",'<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml" lang="ar" dir="rtl"><head><meta charset="utf-8"/><title>الغلاف</title><link rel="stylesheet" href="style.css"/></head><body class="cover-page"><img src="images/cover.jpg" alt="غلاف الرواية"/></body></html>');
+  items.forEach(x=>zip.file("OEBPS/"+x.file,'<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml" lang="ar" dir="rtl"><head><meta charset="utf-8"/><title>'+esc(x.label)+'</title><link rel="stylesheet" href="style.css"/></head><body><main class="chapter"><h2>'+esc(x.label)+'</h2><div class="orn">❦ ❦ ❦</div><div class="body">'+x.c.h+'</div></main></body></html>'));
+  zip.file("OEBPS/nav.xhtml",'<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" lang="ar" dir="rtl"><head><meta charset="utf-8"/><title>المحتويات</title><link rel="stylesheet" href="style.css"/></head><body><nav epub:type="toc"><h1>المحتويات</h1><ol>'+navItems.map(x=>'<li><a href="'+x.file+'">'+esc(x.label)+'</a></li>').join("")+'</ol></nav></body></html>');
+  zip.file("OEBPS/style.css",`html,body{direction:rtl;background:#fff;color:#222;font-family:serif}body{line-height:2;font-size:1em;margin:6%}h1,h2{text-align:center;line-height:1.5}.title{min-height:82vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}.title h1{font-size:2.2em}.author{font-size:1.25em}.brand{margin-top:3em;font-size:.9em;opacity:.55}.cover-page{text-align:center;margin:0;padding:0}.cover-page img{display:block;width:100%;height:auto;max-height:100vh;object-fit:contain}.chapter{max-width:44em;margin:auto}.chapter h2{margin-top:1em}.orn{text-align:center;margin:1em 0}.body p{text-indent:1.2em;margin:.5em 0}.body div{text-indent:1.2em;margin:.5em 0}nav ol{line-height:2.2}`);
+  const uid=crypto.randomUUID?crypto.randomUUID():Date.now()+"-"+Math.random().toString(16).slice(2);zip.file("OEBPS/content.opf",'<?xml version="1.0" encoding="UTF-8"?><package xmlns="http://www.idpf.org/2007/opf" version="3.0" unique-identifier="bookid" xml:lang="ar" dir="rtl"><metadata xmlns:dc="http://purl.org/dc/elements/1.1/"><dc:identifier id="bookid">urn:uuid:'+uid+'</dc:identifier><dc:title>'+title+'</dc:title><dc:creator>'+author+'</dc:creator><dc:language>ar</dc:language><meta property="dcterms:modified">'+new Date().toISOString().replace(/\.\d{3}Z$/,"Z")+'</meta></metadata><manifest>'+manifest+'</manifest><spine page-progression-direction="rtl">'+spine+'</spine></package>');
+  const blob=await zip.generateAsync({type:"blob",mimeType:"application/epub+zip",compression:"DEFLATE",compressionOptions:{level:6}});
+  if(saveHandle){const w=await saveHandle.createWritable();await w.write(blob);await w.close()}else await nativeSaveFile(filename,blob);alert("✓ تم تصدير EPUB بنجاح: "+filename)
+ }catch(e){if(e&&e.name==="AbortError")return;console.error(e);alert("تعذّر إنشاء EPUB: "+(e&&e.message?e.message:"خطأ غير معروف"))}
+}
 $("epubBtn").onclick=exportEpub;$("de").onclick=exportEpub;
 /* تدقيق متقدم: تفعيل التدقيق الأصلي للمتصفح مع محرك روايتي المحلي */
 $("ed").setAttribute("spellcheck","true");$("ed").setAttribute("autocorrect","on");$("pf_o").textContent="🔍 تدقيق إملائي متقدم";
