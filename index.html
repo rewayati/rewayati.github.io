@@ -281,6 +281,13 @@ aside>b{display:block;font-size:19px;padding:4px 2px 10px;border-bottom:1px soli
 }
 </style>
 
+<style id="community-ui">
+.community-head{display:flex;justify-content:space-between;gap:14px;align-items:center;background:linear-gradient(135deg,var(--panel),var(--soft));border:1px solid var(--line);border-radius:20px;padding:18px;margin-bottom:12px;box-shadow:var(--shadow)}
+.community-head h2{margin:0;color:var(--deep)}.community-head p{margin:5px 0 0;color:var(--mut)}
+.community-tabs{display:flex;gap:8px;margin:12px 0}.community-tabs button{flex:1;border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:11px;cursor:pointer;font-weight:800;color:var(--mut)}.community-tabs button.on{background:var(--deep);color:#fff}
+.community-grid{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(230px,.8fr);gap:14px}.community-panel{background:var(--panel);border:1px solid var(--line);border-radius:17px;padding:15px;box-shadow:var(--shadow-sm);margin:10px 0}.panel-title{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px}.rules{line-height:2;margin:5px 0}.forum-post{padding:12px 0;border-bottom:1px solid var(--line)}.forum-post:last-child{border-bottom:0}.forum-post b{font-size:17px}.forum-post small{display:block;color:var(--mut);margin:3px 0}.forum-post p{margin:4px 0;white-space:pre-wrap;line-height:1.9}.composer input,.composer textarea,.reader-tools input{width:100%;border:1px solid var(--line);border-radius:11px;background:var(--bg);padding:10px;margin:6px 0;font:inherit}.composer textarea{min-height:110px}.row{display:flex;gap:8px;flex-wrap:wrap}.writer-gate{text-align:center;padding:30px}.reader-tools{display:flex;gap:8px;margin-bottom:12px}.reader-tools input{margin:0}.reader-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(205px,1fr));gap:18px}.reader-card{background:var(--panel);border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:var(--shadow);cursor:pointer}.reader-cover{aspect-ratio:2/3;background:linear-gradient(155deg,#b47743,#3a2417);display:flex;align-items:center;justify-content:center;color:#fff;font-size:45px;overflow:hidden}.reader-cover img{width:100%;height:100%;object-fit:contain}.reader-card .rcb{padding:12px}.reader-card .rcb b{display:block;font-size:17px}.reader-card .rcb small{color:var(--mut)}.reader-card button{margin:0 12px 12px;width:calc(100% - 24px)}.reader-badge{border:1px solid var(--gold);padding:6px 10px;border-radius:20px;color:var(--acc);font-size:13px;white-space:nowrap}.workshop-prompt{background:linear-gradient(135deg,rgba(201,154,91,.12),transparent);border:1px dashed var(--gold);border-radius:14px;padding:14px;line-height:2;margin-bottom:10px}.workshop-card{border:1px solid var(--line);border-radius:14px;padding:13px;margin:8px 0;background:var(--panel2);cursor:pointer}.workshop-card:hover{border-color:var(--acc)}.entry{padding:12px;border:1px solid var(--line);border-radius:13px;margin:8px 0;background:var(--panel)}.entry small{color:var(--mut)}.entry p{white-space:pre-wrap;line-height:1.95;margin:5px 0}
+@media(max-width:760px){.community-grid{grid-template-columns:1fr}.community-head{align-items:flex-start;flex-direction:column}.reader-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.reader-tools{flex-direction:column}.community-tabs{overflow:auto}.community-tabs button{min-width:170px}}
+</style>
 <style id="pgs"></style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
@@ -747,7 +754,7 @@ body.focus #fcw{display:block}
 <div id="home">
 <div class="hh"><div><h1><img class="lg" id="lg2" alt="">روايتي</h1><div class="tg2">واحة الكاتب العربي لكل العرب</div><small id="em"></small></div><button class="btn g" id="th2">🌙</button></div>
 <div id="nb"></div>
-<p class="lobby">مرحباً بك في مكتبتك. تجوّل بين القاعات، ولكل قاعة رفوفها وكتبها.</p><div class="sec"><button data-s="nv" class="on">📚 قاعة أعمالي</button><button data-s="id">💡 غرفة الأفكار <em id="n3"></em></button><button data-s="rf">📘 قسم المراجع</button><button disabled title="قريباً">🏛 ملتقى الكتّاب · قريباً</button><button disabled title="قريباً">📖 قاعة القراءة · قريباً</button></div>
+<p class="lobby">مرحباً بك في مكتبتك. تجوّل بين القاعات، ولكل قاعة رفوفها وكتبها.</p><div class="sec"><button data-s="nv" class="on">📚 قاعة أعمالي</button><button data-s="id">💡 غرفة الأفكار <em id="n3"></em></button><button data-s="rf">📘 قسم المراجع</button><button data-s="com">🏛 ملتقى الكتّاب</button><button data-s="read">📖 قاعة القراءة</button></div>
 <div id="refs" hidden><div class="shh">📘 قسم المراجع: كتب ترشدك في رحلة النشر</div><div class="spines">
 <button class="spine" id="rf_kdp">📘 دليل النشر على Amazon KDP<small>خطوات الحساب والضرائب والدفع وتجهيز الكتاب العربي</small></button>
 <a class="spine" href="platforms.html" target="_blank" rel="noopener">🌐 النشر على المنصات العربية<small>كيف تختار منصة وتتحقق من شروطها</small></a>
@@ -763,6 +770,30 @@ body.focus #fcw{display:block}
 <details class="dd" data-k="h_ac"><summary>👤 الحساب والخصوصية</summary><div class="ddb"><button class="btn g" id="gas2">📈 إعدادات الإحصائيات</button><a class="btn g" href="privacy.html" target="_blank" rel="noopener">🔒 سياسة الخصوصية</a><a class="btn g" href="terms.html" target="_blank" rel="noopener">📄 شروط الاستخدام</a><button class="btn g" id="out">🚪 تسجيل الخروج</button><button class="btn g" id="del">🗑 حذف حسابي</button></div></details>
 </div></details>
 <div id="grid"></div>
+</div>
+<div id="community" hidden>
+  <div class="community-head"><div><h2>🏛 ملتقى روايتي</h2><p>مساحة اجتماعية للكتّاب والقرّاء، منفصلة عن مخطوطاتك الخاصة.</p></div><button class="btn g" id="writerToggle">✍️ الانضمام ككاتب</button></div>
+  <div class="community-tabs"><button data-cv="forum" class="on">💬 ملتقى الكتاب</button><button data-cv="workshops">🖋 ورشة الكتابة المشتركة</button></div>
+  <div id="forumView">
+    <div class="community-grid">
+      <section class="community-panel"><div class="panel-title"><b>🗣 آخر المشاركات</b><button class="btn g" id="newPost">+ مشاركة</button></div><div id="forumPosts"><div class="emp">جارٍ تحميل الملتقى…</div></div></section>
+      <section class="community-panel"><div class="panel-title"><b>📌 قواعد الملتقى</b></div><ul class="rules"><li>احترام الكاتب والقارئ.</li><li>لا تنشر مخطوطات كاملة من أعمالك الخاصة.</li><li>احترم حقوق الملكية ولا تنقل نصوص الآخرين.</li><li>النقد للنص، لا لصاحبه.</li></ul></section>
+    </div>
+    <div id="postComposer" class="community-panel composer" hidden><b>مشاركة جديدة</b><input id="postTitle" placeholder="عنوان المشاركة"><textarea id="postBody" placeholder="اكتب سؤالك أو تجربتك أو رأيك…"></textarea><div class="row"><button class="btn" id="postSend">نشر المشاركة</button><button class="btn g" id="postCancel">إلغاء</button></div></div>
+  </div>
+  <div id="workshopsView" hidden>
+    <div class="community-panel writer-gate" id="writerGate"><h3>🖋 ورشة الكتابة المشتركة</h3><p>هذه القاعة مخصصة للكتّاب المسجلين. اكتب مع كتّاب آخرين، أضف مقطعك، ناقشه، وصوّت على أفضل اتجاه للنص.</p><button class="btn" id="beWriter">أنا كاتب وأريد الانضمام للورش</button></div>
+    <div id="workshopArea" hidden>
+      <div class="panel-title"><b>ورش مفتوحة</b><button class="btn" id="newWorkshop">+ إنشاء ورشة</button></div><div id="workshopList"></div>
+      <div id="workshopRoom" class="community-panel" hidden><div class="panel-title"><b id="workshopTitle">الورشة</b><button class="btn g" id="closeWorkshop">← العودة للورش</button></div><div id="workshopPrompt" class="workshop-prompt"></div><div class="composer"><textarea id="entryText" placeholder="اكتب مساهمتك في المشهد أو الفكرة…"></textarea><button class="btn" id="entrySend">إضافة المساهمة</button></div><div id="entryList"></div></div>
+    </div>
+    <div id="workshopComposer" class="community-panel composer" hidden><b>إنشاء ورشة جديدة</b><input id="wsTitle" placeholder="اسم الورشة"><textarea id="wsPrompt" placeholder="فكرة الورشة أو المشهد الذي سيكتبه الجميع…"></textarea><div class="row"><button class="btn" id="wsSend">إنشاء</button><button class="btn g" id="wsCancel">إلغاء</button></div></div>
+  </div>
+</div>
+<div id="readerHall" hidden>
+  <div class="community-head"><div><h2>📖 قاعة القراءة</h2><p>هنا يقرأ المستخدمون الأعمال التي أعلن أصحابها اكتمالها.</p></div><span class="reader-badge">للقرّاء والكتّاب</span></div>
+  <div class="reader-tools"><input id="readerSearch" placeholder="🔍 ابحث باسم العمل أو الكاتب"><button class="btn g" id="readerRefresh">↻ تحديث</button></div>
+  <div id="readerGrid" class="reader-grid"><div class="emp">جارٍ تحميل الأعمال…</div></div>
 </div>
 <div id="ideas" hidden>
 <div class="slg">«الأفكار ملقاة على قارعة الطريق، إن لم تأخذها ذهبت لغيرك»</div>
@@ -833,7 +864,7 @@ body.focus #fcw{display:block}
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
 import {getAuth,onAuthStateChanged,createUserWithEmailAndPassword,signInWithEmailAndPassword,signOut,sendPasswordResetEmail,sendEmailVerification,GoogleAuthProvider,signInWithPopup,EmailAuthProvider,reauthenticateWithCredential,reauthenticateWithPopup,deleteUser} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
-import {initializeFirestore,getFirestore,persistentLocalCache,persistentMultipleTabManager,memoryLocalCache,doc,collection,getDocs,writeBatch,terminate,clearIndexedDbPersistence,waitForPendingWrites} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+import {initializeFirestore,getFirestore,persistentLocalCache,persistentMultipleTabManager,memoryLocalCache,doc,collection,getDocs,writeBatch,terminate,clearIndexedDbPersistence,waitForPendingWrites,addDoc,query,where,orderBy,limit,onSnapshot,serverTimestamp,getDoc,setDoc,collectionGroup,deleteDoc} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 const $=id=>document.getElementById(id);
 const K="rewayati_v2";
 let db={novels:[]},s=null,tab="wip",timer;
@@ -1110,8 +1141,45 @@ const ideaTitle=x=>x.split(/\n/)[0].trim().slice(0,50)||"فكرة بدون عن�
 function idSave(i){if(!U)return;i.up=i.up||Date.now();const b=writeBatch(FS);b.set(doc(FS,"users",U.uid,"ideas",i.id),{x:i.x||"",t:i.t||"",c:i.c||[],e:i.e||[],p:i.p||[],o:i.o||[],st:i.st||"new",cr:i.cr||Date.now(),up:i.up,lr:i.lr||0});b.commit().catch(e=>alert("تعذّر حفظ الفكرة ("+(e.code||"")+")"));updDigest()}
 function idDel(i){if(!U)return;const b=writeBatch(FS);b.delete(doc(FS,"users",U.uid,"ideas",i.id));b.commit().catch(e=>alert("تعذّر حذف الفكرة ("+(e.code||"")+")"));IDEAS=IDEAS.filter(x=>x!==i);updDigest()}
 async function loadIdeas(){const q=await getDocs(collection(FS,"users",U.uid,"ideas"));IDEAS=q.docs.map(d=>({id:d.id,...d.data()}))}
-function secUi(){document.querySelectorAll(".sec button").forEach(b=>b.classList.toggle("on",b.dataset.s==sec));$("secnv").hidden=sec!="nv";$("ideas").hidden=sec!="id";$("nn").textContent=sec=="id"?"+ فكرة جديدة":"+ رواية جديدة";$("nn").hidden=sec=="rf";$("refs").hidden=sec!="rf";$("n3").textContent=IDEAS.length?"("+IDEAS.length+")":"";if(sec=="id")renderIdeas()}
-document.querySelectorAll(".sec button").forEach(b=>b.onclick=()=>{sec=b.dataset.s;secUi()});
+
+let PROFILE={role:"reader",name:""},COMM_UNSUB=[],CURRENT_WS=null,READER_WORKS=[];
+const fmtDate=x=>{try{const d=x?.toDate?x.toDate():new Date(x||Date.now());return d.toLocaleDateString("ar-EG")}catch(e){return ""}};
+async function loadProfile(){
+if(!U)return;
+try{const r=await getDoc(doc(FS,"users",U.uid,"profile","main"));if(r.exists())PROFILE={role:r.data().role||"reader",name:r.data().name||""};else PROFILE={role:"reader",name:""}}catch(e){PROFILE={role:"reader",name:""}}
+if(!PROFILE.name){const a=db.novels.find(n=>n.author);PROFILE.name=a?.author||U.displayName||U.email?.split("@")[0]||"مستخدم"}
+}
+async function becomeWriter(){if(!U)return;const name=prompt("اكتب الاسم الذي سيظهر للآخرين في الملتقى والورش:",PROFILE.name||U.displayName||"");if(!name)return;PROFILE={role:"writer",name:name.trim()};await setDoc(doc(FS,"users",U.uid,"profile","main"),{role:"writer",name:PROFILE.name,updated:serverTimestamp()},{merge:true});communityUi();alert("تم تفعيل حسابك ككاتب. أصبحت ورش الكتابة متاحة لك.")}
+function stopCommunity(){COMM_UNSUB.forEach(x=>{try{x()}catch(e){}});COMM_UNSUB=[];CURRENT_WS=null}
+function communityUi(){const w=PROFILE.role=="writer";$("writerToggle").textContent=w?"✍️ حساب كاتب ✓":"✍️ الانضمام ككاتب";$("writerGate").hidden=w;$("workshopArea").hidden=!w}
+async function loadForum(){const box=$("forumPosts");box.innerHTML='<div class="emp">جارٍ تحميل المشاركات…</div>';try{const q=query(collection(FS,"communityPosts"),orderBy("createdAt","desc"),limit(30));const unsub=onSnapshot(q,snap=>{box.innerHTML="";if(snap.empty){box.innerHTML='<div class="emp">لا توجد مشاركات بعد. كن أول من يبدأ الحوار.</div>';return}snap.forEach(d=>{const x=d.data(),el=document.createElement("article");el.className="forum-post";el.innerHTML='<b></b><small></small><p></p>';el.querySelector("b").textContent=x.title||"مشاركة بلا عنوان";el.querySelector("small").textContent=(x.authorName||"مستخدم")+" · "+fmtDate(x.createdAt);el.querySelector("p").textContent=x.body||"";box.appendChild(el)})},()=>{box.innerHTML='<div class="emp">تعذر تحميل الملتقى. راجع قواعد Firebase الخاصة بالمجتمع.</div>'});COMM_UNSUB.push(unsub)}catch(e){box.innerHTML='<div class="emp">تعذر تحميل الملتقى.</div>'}}
+async function sendPost(){const title=$("postTitle").value.trim(),body=$("postBody").value.trim();if(!title||!body)return alert("اكتب عنوان المشاركة ومحتواها.");try{await addDoc(collection(FS,"communityPosts"),{title,body,authorUid:U.uid,authorName:PROFILE.name||"مستخدم",createdAt:serverTimestamp()});$("postTitle").value="";$("postBody").value="";$("postComposer").hidden=true}catch(e){alert("تعذر نشر المشاركة: "+(e.code||e.message))}}
+async function loadReaderHall(){const box=$("readerGrid"),term=($("readerSearch").value||"").trim().toLowerCase();box.innerHTML='<div class="emp">جارٍ تحميل الأعمال المكتملة…</div>';try{const q=query(collectionGroup(FS,"novels"),where("status","==","done"),limit(80));const snap=await getDocs(q);READER_WORKS=snap.docs.map(d=>{const x=d.data();return{id:d.id,uid:d.ref.parent.parent?.id||"",...x}}).filter(x=>!term||((x.title||"")+" "+(x.author||"")).toLowerCase().includes(term));box.innerHTML="";if(!READER_WORKS.length){box.innerHTML='<div class="emp">لا توجد أعمال مكتملة مطابقة للبحث.</div>';return}READER_WORKS.sort((a,b)=>(b.updated||0)-(a.updated||0)).forEach(x=>{const c=document.createElement("article");c.className="reader-card";const cover=x.cover?'<img src="'+x.cover+'" alt="">':(x.title||"؟").trim().charAt(0);c.innerHTML='<div class="reader-cover">'+cover+'</div><div class="rcb"><b></b><small></small></div><button class="btn g">📖 قراءة</button>';c.querySelector("b").textContent=x.title||"عمل بلا عنوان";c.querySelector("small").textContent=(x.author||"كاتب")+" · عمل مكتمل";c.querySelector("button").onclick=()=>openPublishedWork(x);box.appendChild(c)})}catch(e){box.innerHTML='<div class="emp">تعذر تحميل قاعة القراءة. إذا ظهرت رسالة عن الفهارس أو الصلاحيات أرسل لي قواعد Firebase الحالية لأضبطها معك.</div>'}}
+async function openPublishedWork(x){try{const q=await getDocs(collection(FS,"users",x.uid,"novels",x.id,"chapters"));const ch=q.docs.map(d=>({id:d.id,...d.data()}));const win=window.open("","_blank");if(!win){alert("اسمح للنوافذ المنبثقة لفتح الكتاب.");return}let body='';ch.sort((a,b)=>a.id.localeCompare(b.id)).forEach(c=>{body+='<section><h2>'+esc(c.t||"فصل")+'</h2><div>'+c.h+'</div></section>'});win.document.write('<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>'+esc(x.title||"قراءة")+'</title><style>body{max-width:850px;margin:auto;padding:30px;background:#f4efe7;color:#29211c;font-family:Tahoma,Arial,sans-serif;line-height:2}h1{text-align:center}h2{text-align:center;margin-top:55px}section{margin-bottom:45px}@media(max-width:700px){body{padding:16px}}</style></head><body><h1>'+esc(x.title||"")+'</h1><p style="text-align:center">'+esc(x.author||"")+'</p>'+body+'</body></html>');win.document.close()}catch(e){alert("تعذر فتح العمل للقراءة: "+(e.code||e.message))}}
+async function loadWorkshops(){if(PROFILE.role!="writer")return;const box=$("workshopList");box.innerHTML='<div class="emp">جارٍ تحميل الورش…</div>';try{const q=query(collection(FS,"workshops"),where("status","==","open"),orderBy("createdAt","desc"),limit(30));const unsub=onSnapshot(q,snap=>{box.innerHTML="";if(snap.empty){box.innerHTML='<div class="emp">لا توجد ورش مفتوحة. أنشئ أول ورشة.</div>';return}snap.forEach(d=>{const x=d.data(),el=document.createElement("div");el.className="workshop-card";el.innerHTML='<b></b><small></small><p></p>';el.querySelector("b").textContent=x.title||"ورشة";el.querySelector("small").textContent="بواسطة "+(x.createdByName||"كاتب")+" · "+fmtDate(x.createdAt);el.querySelector("p").textContent=x.prompt||"";el.onclick=()=>openWorkshop(d.id,x);box.appendChild(el)})},()=>{box.innerHTML='<div class="emp">تعذر تحميل الورش. راجع صلاحيات Firebase.</div>'});COMM_UNSUB.push(unsub)}catch(e){box.innerHTML='<div class="emp">تعذر تحميل الورش.</div>'}}
+async function createWorkshop(){if(PROFILE.role!="writer")return alert("هذه المساحة للكتّاب المسجلين فقط.");const title=$("wsTitle").value.trim(),prompt=$("wsPrompt").value.trim();if(!title||!prompt)return alert("اكتب اسم الورشة وفكرتها.");try{await addDoc(collection(FS,"workshops"),{title,prompt,createdBy:U.uid,createdByName:PROFILE.name,status:"open",createdAt:serverTimestamp()});$("wsTitle").value="";$("wsPrompt").value="";$("workshopComposer").hidden=true}catch(e){alert("تعذر إنشاء الورشة: "+(e.code||e.message))}}
+async function openWorkshop(id,x){CURRENT_WS={id,...x};$("workshopList").hidden=true;$("workshopRoom").hidden=false;$("workshopTitle").textContent="🖋 "+(x.title||"ورشة");$("workshopPrompt").textContent=x.prompt||"";$("entryText").value="";COMM_UNSUB.forEach(u=>{try{u()}catch(e){}});COMM_UNSUB=[];const q=query(collection(FS,"workshops",id,"entries"),orderBy("createdAt","asc"),limit(100));const unsub=onSnapshot(q,snap=>{const box=$("entryList");box.innerHTML="";snap.forEach(d=>{const v=d.data(),el=document.createElement("article");el.className="entry";el.innerHTML='<small></small><p></p>';el.querySelector("small").textContent=(v.authorName||"كاتب")+" · "+fmtDate(v.createdAt);el.querySelector("p").textContent=v.text||"";box.appendChild(el)})},()=>{$("entryList").innerHTML='<div class="emp">تعذر تحميل مساهمات الورشة.</div>'});COMM_UNSUB.push(unsub)}
+async function sendEntry(){if(!CURRENT_WS||PROFILE.role!="writer")return;const text=$("entryText").value.trim();if(!text)return;try{await addDoc(collection(FS,"workshops",CURRENT_WS.id,"entries"),{text,authorUid:U.uid,authorName:PROFILE.name,createdAt:serverTimestamp()});$("entryText").value=""}catch(e){alert("تعذر إضافة المساهمة: "+(e.code||e.message))}}
+function secUi(){
+ document.querySelectorAll(".sec button").forEach(b=>b.classList.toggle("on",b.dataset.s==sec));
+ $("secnv").hidden=!(["nv","id","rf"].includes(sec));
+ $("ideas").hidden=sec!="id";
+ $("nn").textContent=sec=="id"?"+ فكرة جديدة":"+ رواية جديدة";
+ $("nn").hidden=!(["nv","id"].includes(sec));
+ $("refs").hidden=sec!="rf";
+ $("community").hidden=sec!="com";
+ $("readerHall").hidden=sec!="read";
+ $("n3").textContent=IDEAS.length?"("+IDEAS.length+")":"";
+ if(sec=="id")renderIdeas();
+ if(sec=="com"){communityUi();loadForum();loadWorkshops()}
+ if(sec=="read")loadReaderHall();
+}
+document.querySelectorAll(".sec button").forEach(b=>b.onclick=()=>{sec=b.dataset.s;stopCommunity();secUi()});
+document.querySelectorAll(".community-tabs button").forEach(b=>b.onclick=()=>{document.querySelectorAll(".community-tabs button").forEach(x=>x.classList.toggle("on",x===b));stopCommunity();const v=b.dataset.cv;$("forumView").hidden=v!="forum";$("workshopsView").hidden=v!="workshops";if(v=="workshops")loadWorkshops();else loadForum()});
+$("newPost").onclick=()=>{$("postComposer").hidden=false;$("postTitle").focus()};$("postCancel").onclick=()=>{$("postComposer").hidden=true};$("postSend").onclick=sendPost;
+$("writerToggle").onclick=()=>PROFILE.role=="writer"?alert("حسابك مفعّل ككاتب بالفعل."):becomeWriter();$("beWriter").onclick=becomeWriter;
+$("newWorkshop").onclick=()=>{$("workshopComposer").hidden=false;$('wsTitle').focus()};$("wsCancel").onclick=()=>{$("workshopComposer").hidden=true};$("wsSend").onclick=createWorkshop;$("entrySend").onclick=sendEntry;
+$("closeWorkshop").onclick=()=>{CURRENT_WS=null;$("workshopRoom").hidden=true;$("workshopList").hidden=false;COMM_UNSUB.forEach(u=>{try{u()}catch(e){}});COMM_UNSUB=[];loadWorkshops()};$("readerRefresh").onclick=loadReaderHall;$("readerSearch").oninput=()=>{clearTimeout(window.__rT);window.__rT=setTimeout(loadReaderHall,350)};
 const chips=(a,cls,n)=>(a||[]).slice(0,n).map(t=>'<span class="chip">'+cls+" "+esc(t)+"</span>").join("");
 function renderIdeas(){const q=($("ids").value||"").trim(),L=$("idl");L.innerHTML="";
 const list=IDEAS.filter(i=>!q||[i.x,i.t,...(i.c||[]),...(i.e||[]),...(i.p||[]),...(i.o||[])].join(" ").includes(q)).sort((a,b)=>(b.up||0)-(a.up||0));
@@ -1311,7 +1379,7 @@ await Promise.all(ps)}
 function syncN(n){if(!U)return;pend++;if(!navigator.onLine)$("sv").textContent="غير متصل — سيُحفظ فور عودة الاتصال";
 return sync(n).then(()=>{if(--pend<=0){pend=0;$("sv").textContent="تم الحفظ على حسابك ✓ "+new Date().toLocaleTimeString("ar-EG",{hour:"2-digit",minute:"2-digit"});draftClear()}}).catch(e=>{pend=Math.max(0,pend-1);$("sv").textContent=e.message=="big"?"الفصل كبير جداً، قسّمه إلى فصلين":e.message=="bigcover"?"الغلاف كبير، اختر صورة أصغر":"تعذّر الحفظ ("+(e.code||"خطأ")+")"})}
 async function delN(n){try{const ids=[...new Set([...(n.chs||[]).map(c=>c.id),...(n.ch||[]).map(c=>c.id)])];const refs=ids.map(i=>chdoc(n.id,i));refs.push(doc(FS,"users",U.uid,"novels",n.id));for(let i=0;i<refs.length;i+=400){const b=writeBatch(FS);refs.slice(i,i+400).forEach(r=>b.delete(r));await b.commit()}}catch(e){alert("تعذّر الحذف من الحساب ("+(e.code||"")+")")}}
-async function wipeAccount(){const ns=await getDocs(collection(FS,"users",U.uid,"novels"));for(const d of ns.docs){const cs=await getDocs(collection(FS,"users",U.uid,"novels",d.id,"chapters"));const rs=[...cs.docs.map(x=>x.ref),d.ref];for(let i=0;i<rs.length;i+=400){const b=writeBatch(FS);rs.slice(i,i+400).forEach(r=>b.delete(r));await b.commit()}}const sq={docs:[...(await getDocs(collection(FS,"users",U.uid,"stats"))).docs,...(await getDocs(collection(FS,"users",U.uid,"ideas"))).docs]};for(let i=0;i<sq.docs.length;i+=400){const b=writeBatch(FS);sq.docs.slice(i,i+400).forEach(x=>b.delete(x.ref));await b.commit()}}
+async function wipeAccount(){try{await deleteDoc(doc(FS,"users",U.uid,"profile","main"))}catch(e){}const ns=await getDocs(collection(FS,"users",U.uid,"novels"));for(const d of ns.docs){const cs=await getDocs(collection(FS,"users",U.uid,"novels",d.id,"chapters"));const rs=[...cs.docs.map(x=>x.ref),d.ref];for(let i=0;i<rs.length;i+=400){const b=writeBatch(FS);rs.slice(i,i+400).forEach(r=>b.delete(r));await b.commit()}}const sq={docs:[...(await getDocs(collection(FS,"users",U.uid,"stats"))).docs,...(await getDocs(collection(FS,"users",U.uid,"ideas"))).docs]};for(let i=0;i<sq.docs.length;i+=400){const b=writeBatch(FS);sq.docs.slice(i,i+400).forEach(x=>b.delete(x.ref));await b.commit()}}
 async function offerMigrate(){let L=[];try{const r=localStorage.getItem("rewayati_v2");if(r)L=(JSON.parse(r).novels)||[];else{const o=localStorage.getItem("rewayati_v1");if(o)L=[Object.assign(mk(),JSON.parse(o))]}}catch(e){}
 L=L.filter(n=>n&&n.ch&&n.id&&!db.novels.some(x=>x.id==n.id));if(!L.length||localStorage.getItem("rewayati_mig_done"))return;
 if(!confirm("لقيت "+L.length+" رواية محفوظة على هذا الجهاز من النسخة القديمة. هل ترفعها إلى حسابك؟ (إن لم تكن رواياتك فاضغط إلغاء)"))return;
@@ -1330,7 +1398,7 @@ $("out").onclick=async()=>{
 if(!navigator.onLine){alert("أنت غير متصل بالإنترنت. لا تسجّل الخروج الآن حتى لا يضيع ما لم تتم مزامنته. اتصل بالإنترنت وحاول مجدداً.");return}
 if(pend>0&&!confirm("توجد تعديلات لم تُرفع إلى حسابك بعد. سأنتظر اكتمال المزامنة قبل الخروج. هل تتابع؟"))return;
 busy(1);try{flush();flushSt();await Promise.race([waitForPendingWrites(FS),new Promise((_,r)=>setTimeout(()=>r(new Error("timeout")),20000))])}catch(e){busy(0);alert("تعذّر إكمال المزامنة قبل الخروج، ولذلك لم تُمسح بياناتك المحلية. حاول مجدداً بعد قليل.");return}
-try{await signOut(auth)}catch(e){}try{await tmo((async()=>{await terminate(FS);await clearIndexedDbPersistence(FS)})(),4000)}catch(e){}try{await caches.delete("rewayati-data")}catch(e){}
+stopCommunity();try{await signOut(auth)}catch(e){}try{await tmo((async()=>{await terminate(FS);await clearIndexedDbPersistence(FS)})(),4000)}catch(e){}try{await caches.delete("rewayati-data")}catch(e){}
 busy(0);location.reload()};
 $("del").onclick=async()=>{if(!confirm("ستحذف حسابك وكل رواياتك نهائياً ولن تتمكن من استرجاعها. هل أنت متأكد؟"))return;if(prompt("للتأكيد اكتب كلمة: حذف")!=="حذف")return;
 try{if(U.providerData.some(p=>p.providerId=="password")){const p=prompt("اكتب كلمة السر الحالية للتأكيد");if(!p)return;await reauthenticateWithCredential(U,EmailAuthProvider.credential(U.email,p))}else await reauthenticateWithPopup(U,new GoogleAuthProvider());
@@ -1344,6 +1412,7 @@ $("af").hidden=true;$("al").hidden=false;$("al").textContent="جارٍ تحمي�
 try{await tmo(loadAll(),LOAD_TMO)}catch(e){loadFail(e.message=="timeout"?"استغرق التحميل وقتاً أطول من المعتاد. قد يكون الاتصال ضعيفاً، أو التطبيق مفتوحاً في أكثر من نافذة. جرّب إعادة المحاولة، وإن استمر الأمر فجرّب الوضع الآمن.":"تعذّر تحميل رواياتك. تأكد من الاتصال وحاول مجدداً.");return}
 try{await tmo(loadStats(),10000)}catch(e){ST={};GOAL=0}
 try{await tmo(loadIdeas(),10000)}catch(e){IDEAS=[]}
+try{await tmo(loadProfile(),8000)}catch(e){PROFILE={role:"reader",name:u.displayName||u.email?.split("@")[0]||"مستخدم"}}
 document.body.classList.remove("auth-on");document.body.classList.add("home-on");$("em").textContent=u.email||"";tab="wip";home();offerMigrate();netUi();setTimeout(()=>{prefetch();ideaReminder();bkCheck();updDigest()},1500)});
 
 </script>
