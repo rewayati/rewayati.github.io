@@ -1,13 +1,104 @@
-const C="rewayati-v1";
-self.addEventListener("install",e=>{self.skipWaiting();e.waitUntil(caches.open(C).then(c=>c.addAll(["./","index.html","icon-192.png"])).catch(()=>{}))});
-self.addEventListener("activate",e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!=C).map(x=>caches.delete(x)))).then(()=>self.clients.claim()))});
-self.addEventListener("fetch",e=>{const r=e.request;if(r.method!="GET")return;const u=new URL(r.url);
-const lib=/gstatic\.com\/firebasejs|cdnjs\.cloudflare\.com/.test(r.url);
-const put=x=>{if(x&&x.ok){const y=x.clone();caches.open(C).then(c=>c.put(r,y))}return x};
-if(lib)e.respondWith(caches.match(r).then(m=>m||fetch(r).then(put)));
-else if(u.origin==location.origin)e.respondWith(fetch(r).then(put).catch(()=>caches.match(r).then(m=>m||caches.match("index.html"))))});
+// روايتي — Service Worker v2
+const CACHE = "rewayati-v2";
+const SHELL = [
+    "./",
+    "index.html",
+    "privacy.html",
+    "contract.html",
+    "platforms.html",
+    "manifest.webmanifest",
+    "icon-192.png",
+    "icon-512.png"
+];
 
-self.addEventListener("periodicsync",e=>{if(e.tag=="idea-reminder")e.waitUntil(ideaNote())});
-async function ideaNote(){const c=await caches.open("rewayati-data");const r=await c.match("ideas-digest");if(!r)return;const d=await r.json();if(!d.ideas||!d.ideas.length)return;const i=(d.i||0)%d.ideas.length;d.i=i+1;await c.put("ideas-digest",new Response(JSON.stringify(d)));
-await self.registration.showNotification("💡 فكرة من صندوق أفكارك",{body:"«الأفكار ملقاة على قارعة الطريق، إن لم تأخذها ذهبت لغيرك»\n"+d.ideas[i].t,icon:"icon-192.png",tag:"idea-reminder",lang:"ar",dir:"rtl"})}
-self.addEventListener("notificationclick",e=>{e.notification.close();e.waitUntil(clients.matchAll({type:"window"}).then(l=>{for(const w of l){if("focus" in w)return w.focus()}return clients.openWindow("./")}))});
+// Install Event
+self.addEventListener("install", e => {
+    e.waitUntil(
+        caches.open(CACHE)
+            .then(c => c.addAll(SHELL))
+            .catch(err => console.log('Cache addAll failed:', err))
+            .then(() => self.skipWaiting())
+    );
+});
+
+// Activate Event
+self.addEventListener("activate", e => {
+    e.waitUntil(
+        caches.keys().then(keys => {
+            return Promise.all(
+                keys.filter(key => key !== CACHE)
+                    .map(key => caches.delete(key))
+            );
+        }).then(() => self.clients.claim())
+    );
+});
+
+// Fetch Event
+self.addEventListener("fetch", e => {
+    const req = e.request;
+    if (req.method !== "GET") return;
+    
+    const url = new URL(req.url);
+    
+    // صفحات التطبيق: Network First
+    if (req.mode === "navigate" || SHELL.includes(url.pathname.split("/").pop())) {
+        e.respondWith(
+            fetch(req)
+                .then(res => {
+                    const copy = res.clone();
+                    caches.open(CACHE)
+                        .then(c => c.put(req, copy))
+                        .catch(() => {});
+                    return res;
+                })
+                .catch(() => 
+                    caches.match(req).then(hit => 
+                        hit || (req.mode === "navigate" ? caches.match("index.html") : Response.error())
+                    )
+                )
+        );
+        return;
+    }
+    
+    // مكتبات Firebase وCDN: Cache First
+    if (/gstatic.com\/firebasejs|cdnjs.cloudflare.com/.test(url.href)) {
+        e.respondWith(
+            caches.match(req).then(hit => 
+                hit || fetch(req).then(res => {
+                    const copy = res.clone();
+                    caches.open(CACHE)
+                        .then(c => c.put(req, copy))
+                        .catch(() => {});
+                    return res;
+                })
+            )
+        );
+    }
+});
+
+// Periodic Sync for Reminders
+self.addEventListener("periodicsync", e => {
+    if (e.tag !== "idea-reminder") return;
+    e.waitUntil(
+        self.registration.showNotification("روايتي — دفتر الأفكار", {
+            body: "افتح دفترك واكتب فكرة جديدة اليوم.",
+            icon: "icon-192.png",
+            tag: "idea-reminder",
+            dir: "rtl",
+            lang: "ar"
+        })
+    );
+});
+
+// Notification Click
+self.addEventListener("notificationclick", e => {
+    e.notification.close();
+    e.waitUntil(
+        self.clients.matchAll({ type: "window" }).then(list => {
+            for (const c of list) {
+                if ("focus" in c) return c.focus();
+            }
+            return self.clients.openWindow("./");
+        })
+    );
+});

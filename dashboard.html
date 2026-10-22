@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم - روايتي</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        .dashboard {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            min-height: 100vh;
+        }
+        
+        .sidebar {
+            background: var(--bg-dark);
+            color: var(--text-light);
+            padding: 2rem 1rem;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            width: 250px;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+            margin-top: 2rem;
+        }
+        
+        .sidebar-menu li {
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .sidebar-menu li:hover, .sidebar-menu li.active {
+            background: var(--primary);
+        }
+        
+        .main-content {
+            margin-right: 250px;
+            padding: 2rem;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+        }
+        
+        .stat-card h3 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-card .value {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+        
+        .novels-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .novel-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .novel-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .novel-cover {
+            height: 200px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+        }
+        
+        .novel-info {
+            padding: 1.5rem;
+        }
+        
+        .novel-info h3 {
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background: #eee;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
+            transition: width 0.3s;
+        }
+        
+        .add-novel-btn {
+            position: fixed;
+            bottom: 2rem;
+            left: 2rem;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            font-size: 2rem;
+            cursor: pointer;
+            box-shadow: var(--shadow-lg);
+            transition: all 0.3s;
+        }
+        
+        .add-novel-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                position: relative;
+                height: auto;
+                width: 100%;
+            }
+            
+            .main-content {
+                margin-right: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <span class="logo-icon"></span>
+                <span class="logo-text">روايتي</span>
+            </div>
+            <ul class="sidebar-menu">
+                <li class="active" onclick="showSection('home')">
+                    <span>🏠</span> الرئيسية
+                </li>
+                <li onclick="showSection('novels')">
+                    <span>📚</span> رواياتي
+                </li>
+                <li onclick="showSection('ideas')">
+                    <span>💡</span> الأفكار
+                </li>
+                <li onclick="showSection('stats')">
+                    <span></span> الإحصائيات
+                </li>
+                <li onclick="showSection('world')">
+                    <span>🌍</span> دفتر العالم
+                </li>
+                <li onclick="showSection('backup')">
+                    <span>☁️</span> النسخ الاحتياطي
+                </li>
+                <li onclick="showSection('settings')">
+                    <span>⚙️</span> الإعدادات
+                </li>
+                <li onclick="logout()">
+                    <span></span> تسجيل الخروج
+                </li>
+            </ul>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <div id="homeSection">
+                <h1 style="color: var(--primary); margin-bottom: 2rem;">مرحباً بك في مكتبتك! 👋</h1>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>رواياتي</h3>
+                        <div class="value" id="novelsCount">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>كلمات مكتوبة</h3>
+                        <div class="value" id="wordsCount">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>هدف اليوم</h3>
+                        <div class="value" id="dailyGoal">0 / 500</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>أيام متتالية</h3>
+                        <div class="value" id="streakDays">0</div>
+                    </div>
+                </div>
+                
+                <h2 style="color: var(--primary); margin: 2rem 0 1rem;">آخر الروايات</h2>
+                <div class="novels-grid" id="recentNovels">
+                    <div class="novel-card" onclick="openEditor()">
+                        <div class="novel-cover">📖</div>
+                        <div class="novel-info">
+                            <h3>روايتي الأولى</h3>
+                            <p>ابدأ كتابة روايتك الآن</p>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 0%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <button class="add-novel-btn" onclick="openEditor()" title="رواية جديدة">+</button>
+    
+    <script src="app.js"></script>
+    <script>
+        function showSection(section) {
+            console.log('Showing section:', section);
+        }
+        
+        function openEditor() {
+            window.location.href = 'editor.html';
+        }
+        
+        function logout() {
+            if (confirm('هل تريد تسجيل الخروج؟')) {
+                localStorage.removeItem('userToken');
+                window.location.href = 'index.html';
+            }
+        }
+    </script>
+</body>
+</html>

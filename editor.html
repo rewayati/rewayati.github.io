@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>محرر الروايات - روايتي</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        .editor-container {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .editor-sidebar {
+            background: var(--bg-dark);
+            color: var(--text-light);
+            padding: 1.5rem;
+            overflow-y: auto;
+            border-left: 1px solid var(--glass-border);
+        }
+        
+        .chapters-list {
+            list-style: none;
+            margin-top: 1rem;
+        }
+        
+        .chapter-item {
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .chapter-item:hover, .chapter-item.active {
+            background: var(--primary);
+        }
+        
+        .editor-main {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .editor-toolbar {
+            background: white;
+            padding: 1rem;
+            border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .toolbar-btn {
+            padding: 0.5rem 1rem;
+            background: var(--bg-light);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+            font-family: inherit;
+        }
+        
+        .toolbar-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .editor-content {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+            background: var(--bg-light);
+        }
+        
+        .chapter-title {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            border: 2px solid var(--glass-border);
+            background: white;
+            border-radius: 10px;
+            width: 100%;
+            font-family: inherit;
+        }
+        
+        .chapter-text {
+            min-height: 500px;
+            padding: 2rem;
+            background: white;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            line-height: 2;
+            border: 2px solid var(--glass-border);
+            resize: vertical;
+            width: 100%;
+            font-family: inherit;
+        }
+        
+        .editor-stats {
+            background: white;
+            padding: 1rem;
+            border-top: 1px solid var(--glass-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .word-count {
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .focus-mode {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-dark);
+            z-index: 9999;
+            display: none;
+            padding: 2rem;
+        }
+        
+        .focus-mode.active {
+            display: block;
+        }
+        
+        .focus-mode textarea {
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            color: var(--text-light);
+            border: none;
+            font-size: 1.2rem;
+            line-height: 2;
+            resize: none;
+            font-family: inherit;
+        }
+        
+        @media (max-width: 768px) {
+            .editor-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .editor-sidebar {
+                position: fixed;
+                right: -300px;
+                width: 300px;
+                height: 100vh;
+                transition: right 0.3s;
+                z-index: 100;
+            }
+            
+            .editor-sidebar.open {
+                right: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="editor-container">
+        <!-- Sidebar -->
+        <aside class="editor-sidebar">
+            <div class="logo">
+                <span class="logo-icon">📖</span>
+                <span class="logo-text">روايتي</span>
+            </div>
+            
+            <button class="btn-primary" style="width: 100%; margin-top: 1rem;" onclick="addChapter()">
+                + فصل جديد
+            </button>
+            
+            <h3 style="margin-top: 2rem;">الفصول</h3>
+            <ul class="chapters-list" id="chaptersList">
+                <li class="chapter-item active" onclick="switchChapter(0)">
+                    <span>الفصل الأول</span>
+                </li>
+            </ul>
+            
+            <h3 style="margin-top: 2rem;">🎯 الهدف</h3>
+            <div style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 10px;">
+                <div style="margin-bottom: 0.5rem;">
+                    <span id="goalText">0 / 500 كلمة</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="goalProgress" style="width: 0%;"></div>
+                </div>
+            </div>
+            
+            <button class="btn-secondary" style="width: 100%; margin-top: 2rem;" onclick="saveNovel()">
+                💾 حفظ
+            </button>
+            
+            <button class="btn-secondary" style="width: 100%; margin-top: 0.5rem;" onclick="exportNovel()">
+                📤 تصدير
+            </button>
+            
+            <button class="btn-secondary" style="width: 100%; margin-top: 0.5rem;" onclick="window.location.href='dashboard.html'">
+                ← العودة
+            </button>
+        </aside>
+        
+        <!-- Main Editor -->
+        <main class="editor-main">
+            <div class="editor-toolbar">
+                <button class="toolbar-btn" onclick="toggleFocusMode()">🎯 وضع التركيز</button>
+                <button class="toolbar-btn" onclick="formatText('bold')">B غامق</button>
+                <button class="toolbar-btn" onclick="formatText('italic')">I مائل</button>
+                <button class="toolbar-btn" onclick="formatText('underline')">U تسطير</button>
+                <button class="toolbar-btn" onclick="checkSpelling()"> تدقيق</button>
+                <button class="toolbar-btn" onclick="showMusicPlayer()">🎧 موسيقى</button>
+                <button class="toolbar-btn" onclick="showWorldNotebook()">📖 دفتر العالم</button>
+            </div>
+            
+            <div class="editor-content">
+                <input type="text" class="chapter-title" placeholder="عنوان الفصل" value="الفصل الأول" id="chapterTitle">
+                <textarea class="chapter-text" placeholder="ابدأ الكتابة هنا..." id="chapterText"></textarea>
+            </div>
+            
+            <div class="editor-stats">
+                <div>
+                    <span class="word-count" id="wordCount">0 كلمة</span>
+                    <span style="margin-right: 1rem;" id="charCount">0 حرف</span>
+                </div>
+                <div>
+                    <span>آخر حفظ: <span id="lastSaved">الآن</span></span>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Focus Mode -->
+    <div class="focus-mode" id="focusMode">
+        <button class="toolbar-btn" style="position: fixed; top: 1rem; left: 1rem; z-index: 10000;" onclick="toggleFocusMode()">
+            ✕ خروج من التركيز
+        </button>
+        <textarea id="focusText" placeholder="ابدأ الكتابة هنا..."></textarea>
+    </div>
+    
+    <script src="app.js"></script>
+    <script>
+        let currentChapter = 0;
+        let chapters = [{ title: 'الفصل الأول', content: '' }];
+        
+        // تحديث الإحصائيات
+        document.getElementById('chapterText').addEventListener('input', function() {
+            const text = this.value;
+            const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+            const chars = text.length;
+            
+            document.getElementById('wordCount').textContent = words + ' كلمة';
+            document.getElementById('charCount').textContent = chars + ' حرف';
+            
+            // تحديث الهدف
+            const goal = 500;
+            const progress = Math.min((words / goal) * 100, 100);
+            document.getElementById('goalText').textContent = words + ' / ' + goal + ' كلمة';
+            document.getElementById('goalProgress').style.width = progress + '%';
+            
+            // حفظ تلقائي
+            autoSave();
+        });
+        
+        // حفظ تلقائي
+        let saveTimeout;
+        function autoSave() {
+            clearTimeout(saveTimeout);
+            saveTimeout = setTimeout(() => {
+                chapters[currentChapter].content = document.getElementById('chapterText').value;
+                chapters[currentChapter].title = document.getElementById('chapterTitle').value;
+                localStorage.setItem('novel_chapters', JSON.stringify(chapters));
+                document.getElementById('lastSaved').textContent = 'الآن';
+            }, 1000);
+        }
+        
+        // إضافة فصل جديد
+        function addChapter() {
+            const title = prompt('عنوان الفصل الجديد:');
+            if (title) {
+                chapters.push({ title: title, content: '' });
+                renderChapters();
+                switchChapter(chapters.length - 1);
+            }
+        }
+        
+        // عرض الفصول
+        function renderChapters() {
+            const list = document.getElementById('chaptersList');
+            list.innerHTML = chapters.map((ch, i) => `
+                <li class="chapter-item ${i === currentChapter ? 'active' : ''}" onclick="switchChapter(${i})">
+                    <span>${ch.title}</span>
+                    <span onclick="deleteChapter(${i}, event)">🗑</span>
+                </li>
+            `).join('');
+        }
+        
+        // تبديل الفصل
+        function switchChapter(index) {
+            chapters[currentChapter].content = document.getElementById('chapterText').value;
+            chapters[currentChapter].title = document.getElementById('chapterTitle').value;
+            
+            currentChapter = index;
+            document.getElementById('chapterTitle').value = chapters[index].title;
+            document.getElementById('chapterText').value = chapters[index].content;
+            
+            renderChapters();
+        }
+        
+        // حذف فصل
+        function deleteChapter(index, event) {
+            event.stopPropagation();
+            if (confirm('هل تريد حذف هذا الفصل؟')) {
+                chapters.splice(index, 1);
+                if (currentChapter >= chapters.length) {
+                    currentChapter = chapters.length - 1;
+                }
+                renderChapters();
+                switchChapter(currentChapter);
+            }
+        }
+        
+        // وضع التركيز
+        function toggleFocusMode() {
+            const focusMode = document.getElementById('focusMode');
+            focusMode.classList.toggle('active');
+            if (focusMode.classList.contains('active')) {
+                document.getElementById('focusText').value = document.getElementById('chapterText').value;
+                document.getElementById('focusText').focus();
+            } else {
+                document.getElementById('chapterText').value = document.getElementById('focusText').value;
+            }
+        }
+        
+        // تنسيق النص
+        function formatText(command) {
+            document.execCommand(command, false, null);
+        }
+        
+        // حفظ الرواية
+        function saveNovel() {
+            localStorage.setItem('novel_chapters', JSON.stringify(chapters));
+            alert('تم حفظ الرواية بنجاح! 💾');
+        }
+        
+        // تصدير الرواية
+        function exportNovel() {
+            const options = ['Word', 'PDF', 'EPUB'];
+            const choice = prompt('اختر صيغة التصدير:\n1. Word\n2. PDF\n3. EPUB');
+            
+            if (choice) {
+                alert('جاري التصدير بصيغة ' + options[choice - 1] + '...');
+            }
+        }
+        
+        // تدقيق إملائي
+        function checkSpelling() {
+            alert('جاري التدقيق الإملائي...');
+        }
+        
+        // مشغل الموسيقى
+        function showMusicPlayer() {
+            alert('مشغل الموسيقى - يمكن إضافة مشغل صوتي هنا');
+        }
+        
+        // دفتر العالم
+        function showWorldNotebook() {
+            alert('دفتر العالم - يمكن إضافة صفحة منفصلة هنا');
+        }
+        
+        // تحميل الفصول المحفوظة
+        document.addEventListener('DOMContentLoaded', () => {
+            const saved = localStorage.getItem('novel_chapters');
+            if (saved) {
+                chapters = JSON.parse(saved);
+                renderChapters();
+                switchChapter(0);
+            }
+        });
+    </script>
+</body>
+</html>
