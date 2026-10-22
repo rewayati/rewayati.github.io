@@ -1,0 +1,105 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function isOwner(uid) { return signedIn() && request.auth.uid == uid; }
+    function myProfile() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)/profile/main).data;
+    }
+    // عضو مفعّل للمشاركة: أكّد بلوغه 18 عاماً وله اسم ظاهر
+    function isAdultWriter() {
+      return signedIn()
+        && myProfile().adult == true
+        && myProfile().role == 'writer'
+        && myProfile().name is string
+        && myProfile().name.size() > 0
+        && myProfile().name.size() <= 40;
+    }
+    function txt(v, max) { return v is string && v.size() > 0 && v.size() <= max; }
+
+    // 1) بيانات المستخدم الخاصة (روايات، فصول، دفتر العالم، أفكار، إحصائيات، ملف شخصي):
+    //    لا يقرؤها ولا يكتبها غير صاحبها.
+    match /users/{uid}/{document=**} {
+      allow read, write: if isOwner(uid);
+    }
+
+    // 2) ملتقى الكتّاب
+    match /communityPosts/{id} {
+      allow read: if signedIn();
+      allow create: if isAdultWriter()
+        && request.resource.data.keys().hasOnly(['title','body','authorUid','authorName','createdAt'])
+        && request.resource.data.authorUid == request.auth.uid
+        && request.resource.data.authorName == myProfile().name
+        && txt(request.resource.data.title, 120)
+        && txt(request.resource.data.body, 3000)
+        && request.resource.data.createdAt == request.time;
+      allow update: if false;
+      allow delete: if signedIn() && resource.data.authorUid == request.auth.uid;
+    }
+
+    // 3) ورش الكتابة المشتركة
+    match /workshops/{id} {
+      allow read: if signedIn();
+      allow create: if isAdultWriter()
+        && request.resource.data.keys().hasOnly(['title','prompt','createdBy','createdByName','status','createdAt'])
+        && request.resource.data.createdBy == request.auth.uid
+        && request.resource.data.createdByName == myProfile().name
+        && txt(request.resource.data.title, 100)
+        && txt(request.resource.data.prompt, 1500)
+        && request.resource.data.status == 'open'
+        && request.resource.data.createdAt == request.time;
+      allow update: if signedIn()
+        && resource.data.createdBy == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+        && request.resource.data.status in ['open','closed'];
+      allow delete: if signedIn() && resource.data.createdBy == request.auth.uid;
+
+      match /entries/{eid} {
+        allow read: if signedIn();
+        allow create: if isAdultWriter()
+          && request.resource.data.keys().hasOnly(['text','authorUid','authorName','createdAt'])
+          && request.resource.data.authorUid == request.auth.uid
+          && request.resource.data.authorName == myProfile().name
+          && txt(request.resource.data.text, 2000)
+          && request.resource.data.createdAt == request.time;
+        allow update: if false;
+        allow delete: if signedIn() && resource.data.authorUid == request.auth.uid;
+      }
+    }
+
+    // 4) قاعة القراءة: نسخ منشورة باختيار صاحب العمل فقط (ليست روايات المستخدم الخاصة)
+    match /publishedWorks/{id} {
+      allow read: if signedIn();
+      allow create, update: if signedIn()
+        && request.resource.data.keys().hasOnly(['ownerUid','title','author','cover','wc','count','publishedAt'])
+        && request.resource.data.ownerUid == request.auth.uid
+        && (request.method == 'create' || resource.data.ownerUid == request.auth.uid)
+        && request.resource.data.title is string && request.resource.data.title.size() <= 300
+        && request.resource.data.author is string && request.resource.data.author.size() <= 200
+        && request.resource.data.cover is string && request.resource.data.cover.size() <= 900000
+        && request.resource.data.publishedAt == request.time;
+      allow delete: if signedIn() && resource.data.ownerUid == request.auth.uid;
+
+      match /chapters/{cid} {
+        allow read: if signedIn();
+        allow create, update: if signedIn()
+          && request.resource.data.keys().hasOnly(['ownerUid','i','t','h'])
+          && request.resource.data.ownerUid == request.auth.uid
+          && request.resource.data.h is string && request.resource.data.h.size() < 900000
+          && request.resource.data.t is string && request.resource.data.t.size() <= 200
+          && (request.method == 'create' || resource.data.ownerUid == request.auth.uid);
+        allow delete: if signedIn() && resource.data.ownerUid == request.auth.uid;
+      }
+    }
+
+    // 5) البلاغات: يكتبها أي مستخدم مسجّل، ولا يقرؤها أحد من التطبيق (تُقرأ من لوحة Firebase)
+    match /reports/{id} {
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['kind','path','why','reporterUid','createdAt'])
+        && request.resource.data.reporterUid == request.auth.uid
+        && request.resource.data.createdAt == request.time;
+      allow read, update, delete: if false;
+    }
+  }
+}

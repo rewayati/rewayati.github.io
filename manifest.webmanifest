@@ -1,32 +1,16 @@
 {
- "name": "روايتي",
- "short_name": "روايتي",
- "description": "اكتب روايتك ونسّقها وصدّرها Word أو PDF",
- "lang": "ar",
- "dir": "rtl",
- "start_url": "./",
- "scope": "./",
- "display": "standalone",
- "background_color": "#000000",
- "theme_color": "#8b4a2b",
- "icons": [
-  {
-   "src": "icon-192.png",
-   "sizes": "192x192",
-   "type": "image/png",
-   "purpose": "any"
-  },
-  {
-   "src": "icon-512.png",
-   "sizes": "512x512",
-   "type": "image/png",
-   "purpose": "any"
-  },
-  {
-   "src": "icon-maskable-512.png",
-   "sizes": "512x512",
-   "type": "image/png",
-   "purpose": "maskable"
-  }
- ]
+  "name": "روايتي — استوديو كتابة الروايات",
+  "short_name": "روايتي",
+  "description": "تطبيق عربي لكتابة الروايات: فصول، دفتر عالم، أفكار، إحصائيات، وتصدير EPUB وWord وPDF.",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#faf6ef",
+  "theme_color": "#8b4a2b",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
 }
