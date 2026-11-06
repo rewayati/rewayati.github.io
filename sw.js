@@ -1,6 +1,6 @@
 // روايتي — Service Worker v3
-const CACHE = "rewayati-v3";
-const SHELL = ["./","index.html","app.html","styles.css","privacy.html","terms.html","contract.html","platforms.html","kdp-guide.html","manifest.webmanifest","icon-192.png","icon-512.png"];
+const CACHE = "rewayati-v4";
+const SHELL = ["./","index.html","app.html","styles.css","privacy.html","terms.html","contract.html","platforms.html","kdp-guide.html","manifest.webmanifest","icon-192.png","icon-512.png","logo.png","logo-notag.png","logo-mark.png"];
 const LIBS = /gstatic\.com\/firebasejs|cdnjs\.cloudflare\.com/;
 
 self.addEventListener("install", e => {
